@@ -9,7 +9,9 @@ GUILD = os.getenv('DISCORD_GUILD')
 
 # Client is an object that represents a connection to Discord 
 # Client handles events, trackes state, and interacts with Discord API 
-client = discord.Client(intents=discord.Intents.default())
+intents = discord.Intents.default()
+intents.members = True
+client = discord.Client(intents=intents)
 
 # this event will trigger when the initial connection from the bot --> server is established 
 @client.event
@@ -39,7 +41,8 @@ async def on_member_join(member):
     await member.dm_channel.send(
         f'Hi {member.name}, you are my favorite :3!'
     )
-    
+
+# if the bot cannot see other members in the server, it cannot collect messages
 @client.event
 async def on_message(message):
     if message.author == client.user:
@@ -54,7 +57,7 @@ async def on_message(message):
         ),
     ]
 
-    if message.content == '!ping':
+    if message.content == 'ping':
         response = random.choice(brooklyn_99_quotes)
         await message.channel.send(response)
 
