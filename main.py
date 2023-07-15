@@ -1,6 +1,7 @@
 import os
 import random
 import discord
+from discord.ext import commands 
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -11,6 +12,8 @@ GUILD = os.getenv('DISCORD_GUILD')
 # Client handles events, trackes state, and interacts with Discord API 
 intents = discord.Intents.default()
 intents.members = True
+intents.messages = True 
+intents.guilds = True
 client = discord.Client(intents=intents)
 
 # this event will trigger when the initial connection from the bot --> server is established 
@@ -35,32 +38,25 @@ async def on_ready():   # event handler is on_ready or AKA when connection is es
     print(f'Guild Members:\n - {member_list}')  # for some reason it only outputs the bot name... EDIT: probably the premissions 
     print('Done!')
 
-@client.event # this has not been tested, it should dm the person that just joined the server 
+@client.event # tested and works
 async def on_member_join(member): 
     await member.create_dm()
     await member.dm_channel.send(
         f'Hi {member.name}, you are my favorite :3!'
     )
 
-# if the bot cannot see other members in the server, it cannot collect messages
+
 @client.event
 async def on_message(message):
-    if message.author == client.user:
-        return
+    # if message.author == client.user:
+    #     return
 
-    brooklyn_99_quotes = [
-        'I\'m the human form of the 💯 emoji.',
-        'Bingpot!',
-        (
-            'Cool. Cool cool cool cool cool cool cool, '
-            'no doubt no doubt no doubt no doubt.'
-        ),
-    ]
+
 
     if message.content == 'ping':
-        response = random.choice(brooklyn_99_quotes)
+        response = 'pong'
         await message.channel.send(response)
-
+    await client.process_commands(message)
 
     
 
