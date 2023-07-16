@@ -14,6 +14,8 @@ intents = discord.Intents.default()
 intents.members = True
 intents.messages = True 
 intents.guilds = True
+# lets the bot respond back to messages 
+intents.message_content = True
 client = discord.Client(intents=intents)
 
 # this event will trigger when the initial connection from the bot --> server is established 
@@ -48,15 +50,13 @@ async def on_member_join(member):
 
 @client.event
 async def on_message(message):
-    # if message.author == client.user:
-    #     return 
-
-
+    if message.author == client.user:
+        return 
 
     if message.content == 'ping':
         response = 'pong'
         await message.channel.send(response)
-    await client.process_commands(message)
+    
 
     
 
