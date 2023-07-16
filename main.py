@@ -1,12 +1,17 @@
+# imports for discord bot
 import os
 import random
 import discord
 from discord.ext import commands 
 from dotenv import load_dotenv
-
 load_dotenv()
+
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
+
+# imports for the riot games api 
+from riotwatcher import LolWatcher
+watcher = LolWatcher('API_KEY')
 
 # Client is an object that represents a connection to Discord 
 # Client handles events, trackes state, and interacts with Discord API 
@@ -50,6 +55,7 @@ async def on_member_join(member):
 
 @client.event
 async def on_message(message):
+    # checks if the message of the user is a user and not a bot
     if message.author == client.user:
         return 
 
