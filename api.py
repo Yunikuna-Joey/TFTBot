@@ -8,7 +8,7 @@ import requests
 load_dotenv()
 
 # Establishes connection to RGA via key (The key must be explicitly stated in main file)
-rga = 'RGAPI-aabb0691-a202-4949-8532-f8450e1d6b1d'
+rga = 'RGAPI-01527927-e99b-4790-823f-a1c1eb3c62c6'
 watcher = LolWatcher(rga) 
 
 # Gives initial region to start with 
@@ -44,3 +44,21 @@ if response.status_code == 200:
 else: 
     print(f"Failed to fetch free champions. Status code: {response.status_code}")
     print("None")
+
+# testing if we can get the names of the champions in the rotation 
+def champ_info(champion_id):
+    url = f'https://na1.api.riotgames.com/lol/champions/{champion_id}'
+    headers = {'X-Riot-TOken': rga}
+
+    try: 
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        champion_info = response.json()
+        return champion_info
+    
+    except requests.exceptions.RequestException as e: 
+        print('Error: ', e)
+        return None
+    
+a = int(input("What is the champion number you are looking for? "))
+champ_info(a)
