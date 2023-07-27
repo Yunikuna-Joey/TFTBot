@@ -2,13 +2,14 @@
 from dotenv import load_dotenv
 from riotwatcher import LolWatcher
 import requests
+import os 
 
 
 # loads the variables to be used in this py file 
 load_dotenv()
+rga = os.getenv('API_KEY')
 
 # Establishes connection to RGA via key (The key must be explicitly stated in main file)
-rga = 'RGAPI-01527927-e99b-4790-823f-a1c1eb3c62c6'
 watcher = LolWatcher(rga) 
 
 # Gives initial region to start with 
