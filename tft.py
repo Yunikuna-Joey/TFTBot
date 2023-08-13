@@ -55,20 +55,42 @@ def tftWinRate(id):
     if response.status_code == 200: 
         data = response.json() 
         # print('Win Rate: ' + data['wins'] / data['losses'])
+
         # data is a list here
         entry = data[0]
+        # if the data is a DICTIONARY in a LIST --> use the first index and call upon as the dictionary k/v
         wins = entry['wins']
         loss = entry['losses']
-        print('Win Rate: ' + wins/loss)
+        print( (wins/loss) * 100)
+        print(data)
 
     else: 
         print(f'Error: {response.status_code}')    
 
+# display player rank 
+def displayRank(id): 
+    # tft test
+    base_url = f'https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/{id}'
+    headers = {"X-Riot-Token" : rga}
+
+
+    response = requests.get(base_url, headers=headers)
+
+    if response.status_code == 200: 
+        # formats the data to be in JSON format to be extracted 
+        data = response.json() 
+
+        display = data[0]
+        player_rank = display['tier']
+        player_tier = display['rank'] 
+
+        print('Your current rank is ' + player_rank + ' ' + player_tier)
+
 # -------------------------------------------------------------------------
 # main class if you will 
 # tftProfile(id)
-tftWinRate(id)
-
+# tftWinRate(id)
+displayRank(id)
 
 
 
