@@ -131,11 +131,7 @@ async def tftstatus(ctx):
         await ctx.send('Maintenance Region: ' +  region + '\n' + 
                        'Maintenance Status: ' + status + '\n' + 
                        'Maintenance Issue: ' + issue_name)
-        
-        
 
-
-    
     else: 
         print(f'Error code: {response.status_code}')
 

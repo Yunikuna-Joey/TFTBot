@@ -1,3 +1,4 @@
+# ********** THIS FILE WILL BE USED FOR DISPLAYING JSON DATA TO BE MANIPULATED **********
 # imports 
 from dotenv import load_dotenv
 from riotwatcher import LolWatcher
@@ -11,6 +12,7 @@ import json
     # 3xx redirect
     # 4xx client error
     # 5xx server error  
+
 
 # loads the variables to be used in this py file 
 load_dotenv()
