@@ -4,6 +4,10 @@ import random
 import discord
 import requests 
 
+# will help with restructuring bot commands (everything client.event --> bot.event)
+from discord.ext import commands
+
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -29,16 +33,20 @@ intents.messages = True
 intents.guilds = True
 # lets the bot respond back to messages 
 intents.message_content = True
-client = discord.Client(intents=intents)
+## this line of code is old  --> replaced with the next line underneath this 
+# client = discord.Client(intents=intents)
+
+# replaced with 
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 # # this event will trigger when the initial connection from the bot --> server is established 
-@client.event
+@bot.event
 async def on_ready():   # event handler is on_ready or AKA when connection is established bot --> server 
-    for guild in client.guilds: 
+    for guild in bot.guilds: 
         if guild.name == GUILD: 
             break
     print(
-        f'{client.user} has connected to Discord!\n'
+        f'{bot.user} has connected to Discord!\n'
         f'{guild.name}(id: {guild.id})\n'  
     )
 
@@ -53,92 +61,44 @@ async def on_ready():   # event handler is on_ready or AKA when connection is es
     print(f'Guild Members:\n - {member_list}')  # for some reason it only outputs the bot name... EDIT: probably the premissions 
     print('Done!')
 
-@client.event # tested and works
+@bot.event # tested and works
 async def on_member_join(member): 
     await member.create_dm()
     await member.dm_channel.send(
         f'Hi {member.name}, you are my favorite :3!'
     )
 
+# to use commands we will reference the prefix plus the function name 
+@bot.command() 
+async def ping(ctx):
+    await ctx.send('pong')
 
-@client.event
-async def on_message(message):
-    # checks if the message of the user is a user and not a bot
-    if message.author == client.user:
-        return 
+@bot.command() 
+async def tftrank(ctx, arg_ign): 
+    # grab the information about the ign that is being passed in the argument
+    user_data = watcher.summoner.by_name(region_routing_value, arg_ign)
+    id = user_data['id']
 
-    if message.content == 'ping':
-        response = 'pong'
-        await message.channel.send(response)
+    # API call here
+    url = f'https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/{id}' 
+    headers = {'X-Riot-Token' : rga}
+    response = requests.get(url, headers=headers)
 
-    if message.content == 'test': 
-        response = 'you suck'
-        await message.channel.send(response)
+    # if we get a successful http code
+    if response.status_code == 200: 
+        data = response.json()
+        entry = data[0]
+        player_tier = entry['tier']
+        player_rank = entry['rank']
 
-    # This is currently working, but will need to find a way to determine user
-    if message.content == 'tft':
-        # we should grab user data as soon as the message is called 
-        user_data = watcher.summoner.by_name(region_routing_value, ign)
-        id = user_data['id']
-        
-        url = f'https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/{id}'
-        headers = {"X-Riot-Token" : rga}
+        # debug (ensures that the call was made)
+        print('Ran tft rank command')
 
-        response = requests.get(url, headers=headers)
-
-        if response.status_code == 200: 
-            data = response.json() 
-            entry = data[0]
-            player_tier = entry['tier']
-            player_rank = entry['rank']
-
-            print('Your current rank is ' + player_tier + ' ' + player_rank)
-            # await message.channel.send('Your current rank is ' + player_tier + ' ' + player_rank)
-            await message.channel.send('Your current rank is ' + player_tier + ' ' + player_rank)
-
-        else: 
-            print(f'Error: {response.status_code}') 
-            # await message.channel.send(f'Error: {response.status_code}') 
-            await message.channel.send('test1')
-
-
-
-# @client.event
-# async def on_Rank(message): 
-#     # checks if the message of the user is actually a USER and not BOT 
-#     if message.author == client.user: 
-#         return 
+        await ctx.send('Your current TFT rank is ' + player_tier + ' ' + player_rank)
     
-#     if message.content == 'z': 
-#         # we should grab user data as soon as the message is called 
-#         user_data = watcher.summoner.by_name(region_routing_value, ign)
-#         id = user_data['id']
-        
-#         url = f'https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/{id}'
-#         headers = {"X-Riot-Token" : rga}
-
-#         response = requests.get(url, headers=headers)
-
-#         if response.status_code == 200: 
-#             data = response.json() 
-#             entry = data[0]
-#             player_tier = entry['tier']
-#             player_rank = entry['rank']
-
-#             print('Your current rank is ' + player_tier + ' ' + player_rank)
-#             # await message.channel.send('Your current rank is ' + player_tier + ' ' + player_rank)
-#             await message.channel.send('test')
-
-#         else: 
-#             print(f'Error: {response.status_code}') 
-#             # await message.channel.send(f'Error: {response.status_code}') 
-#             await message.channel.send('test1')
-#         content = 'yes'
-#         await message.channel.send(content)
+    else: 
+        print(f'Error: {response.status_code}')
+        await ctx.send(f'Error: {response.status_code}')
 
 
-
-
-
-
-client.run(TOKEN)
+bot.run(TOKEN)
