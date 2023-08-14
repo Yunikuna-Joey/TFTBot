@@ -90,15 +90,53 @@ async def tftrank(ctx, arg_ign):
         entry = data[0]
         player_tier = entry['tier']
         player_rank = entry['rank']
+        player_lp = entry['leaguePoints']
 
         # debug (ensures that the call was made)
         print('Ran tft rank command')
-
-        await ctx.send('Your current TFT rank is ' + player_tier + ' ' + player_rank)
+        # outputs into the discord channel 
+        await ctx.send('Your current TFT rank is ' + player_tier + ' ' + player_rank + '\n' + 'LP: ' + str(player_lp)) 
     
     else: 
         print(f'Error: {response.status_code}')
+        # outputs into the discord channel 
         await ctx.send(f'Error: {response.status_code}')
 
+@bot.command() 
+async def tftstatus(ctx): 
+    # API call 
+    url = f'https://na1.api.riotgames.com/tft/status/v1/platform-data?api_key=' + rga
+    headers = {'X-Riot-Token': rga} 
+
+    response = requests.get(url, headers=headers)
+    
+    # successful http code 
+    if response.status_code == 200: 
+        data = response.json()
+        print('Ran tft status command')
+
+        # should have the output 'North America' 
+        region = data['name']
+
+        # gives access to status and issue content
+        maint_key = data['maintenances'][0]
+        # should be in_progress 
+        status = maint_key['maintenance_status']
+
+        # gives access to the specific issue of maintenance
+        issue_content = maint_key['titles'][0]
+        # should be the NAME of issue 
+        issue_name = issue_content['content']
+
+        await ctx.send('Maintenance Region: ' +  region + '\n' + 
+                       'Maintenance Status: ' + status + '\n' + 
+                       'Maintenance Issue: ' + issue_name)
+        
+        
+
+
+    
+    else: 
+        print(f'Error code: {response.status_code}')
 
 bot.run(TOKEN)

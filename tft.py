@@ -86,11 +86,53 @@ def displayRank(id):
 
         print('Your current rank is ' + player_rank + ' ' + player_tier)
 
+def status(): 
+    # API call 
+    url = f'https://na1.api.riotgames.com/tft/status/v1/platform-data?api_key=' + rga
+    headers = {'X-Riot-Token': rga} 
+
+    response = requests.get(url, headers=headers)
+    
+    # successful http code 
+    if response.status_code == 200: 
+        data = response.json()
+        print('Ran tft status command')
+
+        # should have the output 'North America' (true)
+        entry = data['name']
+
+        hehe = data['maintenances'][0]
+
+
+        status  = hehe['maintenance_status']
+
+        # a = hehe['titles'][0]
+
+        # b = a['content']
+
+
+        # print(data)
+        # print(entry)
+
+        # Has the output: in_progress 
+        print(status)
+
+
+        # Has the output: Split End Transfers Disabled 
+        # print(b)
+    
+    else: 
+        print(f'Error code: {response.status_code}')
+
+
 # -------------------------------------------------------------------------
 # main class if you will 
 # tftProfile(id)
 # tftWinRate(id)
-displayRank(id)
+# displayRank(id)
+status()
+
+
 
 
 
