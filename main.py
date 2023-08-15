@@ -19,6 +19,9 @@ rga = os.getenv('API_KEY')
 from riotwatcher import LolWatcher
 watcher = LolWatcher(rga) 
 
+from riotwatcher import TftWatcher
+twatcher = TftWatcher(rga)
+
 # API routing variables 
 region_routing_value = 'NA1'
 ign = 'Yunikuna'
@@ -68,6 +71,15 @@ async def on_member_join(member):
         f'Hi {member.name}, you are my favorite :3!'
     )
 
+@bot.command() 
+async def clearhistory(ctx, amount:int): 
+    if amount <= 0: 
+        await ctx.send('Please indicate the amount of messages to be deleted: ')
+        return
+    
+    deleted_messages = await ctx.channel.purge(limit= amount + 1)
+    await ctx.send(f'Deleted {len(deleted_messages) - 1} messages.')
+
 # to use commands we will reference the prefix plus the function name 
 @bot.command() 
 async def ping(ctx):
@@ -76,32 +88,21 @@ async def ping(ctx):
 @bot.command() 
 async def tftrank(ctx, arg_ign): 
     # grab the information about the ign that is being passed in the argument
-    user_data = watcher.summoner.by_name(region_routing_value, arg_ign)
+    user_data = twatcher.summoner.by_name(region_routing_value, arg_ign)
     id = user_data['id']
 
-    # API call here
-    url = f'https://na1.api.riotgames.com/tft/league/v1/entries/by-summoner/{id}' 
-    headers = {'X-Riot-Token' : rga}
-    response = requests.get(url, headers=headers)
+    rank_data = twatcher.league.by_summoner(region_routing_value, id)
+    # print(rank_data)
 
-    # if we get a successful http code
-    if response.status_code == 200: 
-        data = response.json()
-        entry = data[0]
-        player_tier = entry['tier']
-        player_rank = entry['rank']
-        player_lp = entry['leaguePoints']
+    entry = rank_data[0] 
+    player_tier = entry['tier']
+    player_rank = entry['rank']
+    player_lp = entry['leaguePoints']
 
-        # debug (ensures that the call was made)
-        print('Ran tft rank command')
-        # outputs into the discord channel 
-        await ctx.send('Your current TFT rank is ' + player_tier + ' ' + player_rank + '\n' + 'LP: ' + str(player_lp)) 
-    
-    else: 
-        print(f'Error: {response.status_code}')
-        # outputs into the discord channel 
-        await ctx.send(f'Error: {response.status_code}')
+    print('Ran tftrank command!')
+    await ctx.send('Your current TFT rank is ' + player_tier + ' ' + player_rank + '\n' + 'LP: ' + str(player_lp))
 
+# doesn't have status api for riot games so we will go to the link instead of in-line function
 @bot.command() 
 async def tftstatus(ctx): 
     # API call 
@@ -134,5 +135,19 @@ async def tftstatus(ctx):
 
     else: 
         print(f'Error code: {response.status_code}')
+
+@bot.command()
+async def match_history(ctx, arg_ign): 
+    user_data = twatcher.summoner.by_name(region_routing_value, arg_ign)
+    puuid = user_data['puuid']
+
+    match_data = twatcher.match.by_puuid(region_routing_value, puuid)
+    print(match_data)
+
+    await ctx.send('Command in progress :))')
+
+
+
+
 
 bot.run(TOKEN)

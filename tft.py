@@ -3,6 +3,7 @@
 from dotenv import load_dotenv
 # from riotwatcher import LolWatcher
 from riotwatcher import TftWatcher
+# from riotwatcher import LolWatcher
 import requests
 import os 
 import json
@@ -20,41 +21,49 @@ load_dotenv()
 rga = os.getenv('API_KEY')
 
 # create a watcher so that information can be passed 
-# watcher = LolWatcher(rga)
-watcher = TftWatcher(rga)
+# LOLwatcher = LolWatcher(rga)
+twatcher = TftWatcher(rga)
 
 # ign and region of the said user
 regionValue = 'NA1'
 ign = 'Yunikuna'
 
 # profile information about user
-name_data = watcher.summoner.by_name(regionValue, ign)
+name_data = twatcher.summoner.by_name(region=regionValue, summoner_name=ign)
+# print(name_data)
+
 # lists out the information in a json dictionary to be extracted 
 # print(name_data)
 id = name_data['id']
 
 def summoner(id): 
-    base_url = f'https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/Yunikuna?api_key=' + rga
-    headers = {"X-Riot-Token" : rga}
+    rank_data = twatcher.league.by_summoner(regionValue, id)
+    print(rank_data)
 
+    entry = rank_data[0] 
+    player_tier = entry['tier']
+    player_rank = entry['rank']
+    player_lp = entry['leaguePoints']
 
-    response = requests.get(base_url, headers=headers)
+    print('Your current TFT rank is ' + player_tier + ' ' + player_rank + '\n' + 'LP: ' + str(player_lp))
 
-    if response.status_code == 200: 
-        data = response.json() 
-        # print(data)
-        # holds the PUUID of a summoner
-        puuid_val = data['puuid']
+    # puuid_val = name_data['puuid']
+    # print(puuid_val)
 
-        
-        match_data = watcher.match.matchlist_by_puuid(region=regionValue, puuid=puuid_val)
-        print(match_data)
+    # match_data = twatcher.match.by_puuid(region=regionValue, puuid=puuid_val)
+    # print(match_data)
 
+def history(): 
+    user_data = twatcher.summoner.by_name(regionValue, ign)
+    puuid = user_data['puuid']
 
+    match_data = twatcher.match.by_puuid(regionValue, puuid)
+    # print(match_data)
 
+    match_details = twatcher.match.by_id(regionValue, match_data[0])
+    print(match_details)
 
-    else: 
-        print(f'Error: {response.status_code}')
+    
 
 def tftProfile(id): 
     # tft test
@@ -158,9 +167,9 @@ def status():
 # tftWinRate(id)
 # displayRank(id)
 # status()
-summoner(id)
+# summoner(id)
 
-
+history()
 
 
 
