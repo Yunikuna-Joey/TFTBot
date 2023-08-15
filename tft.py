@@ -1,7 +1,8 @@
 # ********** THIS FILE WILL BE USED FOR DISPLAYING JSON DATA TO BE MANIPULATED **********
 # imports 
 from dotenv import load_dotenv
-from riotwatcher import LolWatcher
+# from riotwatcher import LolWatcher
+from riotwatcher import TftWatcher
 import requests
 import os 
 import json
@@ -19,7 +20,8 @@ load_dotenv()
 rga = os.getenv('API_KEY')
 
 # create a watcher so that information can be passed 
-watcher = LolWatcher(rga)
+# watcher = LolWatcher(rga)
+watcher = TftWatcher(rga)
 
 # ign and region of the said user
 regionValue = 'NA1'
@@ -30,6 +32,29 @@ name_data = watcher.summoner.by_name(regionValue, ign)
 # lists out the information in a json dictionary to be extracted 
 # print(name_data)
 id = name_data['id']
+
+def summoner(id): 
+    base_url = f'https://na1.api.riotgames.com/tft/summoner/v1/summoners/by-name/Yunikuna?api_key=' + rga
+    headers = {"X-Riot-Token" : rga}
+
+
+    response = requests.get(base_url, headers=headers)
+
+    if response.status_code == 200: 
+        data = response.json() 
+        # print(data)
+        # holds the PUUID of a summoner
+        puuid_val = data['puuid']
+
+        
+        match_data = watcher.match.matchlist_by_puuid(region=regionValue, puuid=puuid_val)
+        print(match_data)
+
+
+
+
+    else: 
+        print(f'Error: {response.status_code}')
 
 def tftProfile(id): 
     # tft test
@@ -132,8 +157,8 @@ def status():
 # tftProfile(id)
 # tftWinRate(id)
 # displayRank(id)
-status()
-
+# status()
+summoner(id)
 
 
 
