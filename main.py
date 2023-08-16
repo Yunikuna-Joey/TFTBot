@@ -144,6 +144,10 @@ async def match_history(ctx, arg_ign):
     match_data = twatcher.match.by_puuid(region_routing_value, puuid)
     print(match_data)
 
+    match_details = twatcher.match.by_id(region_routing_value, match_data[0])
+    print(match_details)
+    
+
     await ctx.send('Command in progress :))')
 
 bot.run(TOKEN)

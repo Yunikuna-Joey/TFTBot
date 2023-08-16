@@ -61,7 +61,19 @@ def history():
     # print(match_data)
 
     match_details = twatcher.match.by_id(regionValue, match_data[0])
-    print(match_details)
+    # print(match_details)
+    # print(type(match_details))
+    # print(match_details['info']['participants'])
+    entry = match_details['info']['participants'] 
+    print(entry[0])
+    print(entry[1])
+    print(entry[2])
+    print(entry[3])
+    print(entry[4])
+    print(entry[5])
+    print(entry[6])
+    print(entry[7])
+
 
     
 
