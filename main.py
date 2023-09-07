@@ -18,13 +18,16 @@ rga = os.getenv('API_KEY')
 # imports for the riot games api 
 from riotwatcher import LolWatcher
 watcher = LolWatcher(rga) 
-
+# TFT stats 
 from riotwatcher import TftWatcher
 twatcher = TftWatcher(rga)
+# Valorant stats  
+from riotwatcher import ValWatcher
+vwatcher = ValWatcher(rga)
 
 # API routing variables 
 region_routing_value = 'NA1'
-ign = 'Yunikuna'
+# ign = 'Yunikuna'
 
 
 
